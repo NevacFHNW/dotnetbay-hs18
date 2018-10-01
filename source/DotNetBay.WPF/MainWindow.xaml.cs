@@ -39,7 +39,8 @@ namespace DotNetBay.WPF
         private void New_Auction_Button_Click(object sender, RoutedEventArgs e)
         {
             // View Add New Auction
-
+            var sellView = new SellView();
+            sellView.ShowDialog(); // Blocking
         }
     }
 }
