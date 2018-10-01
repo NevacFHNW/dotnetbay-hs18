@@ -49,10 +49,21 @@ namespace DotNetBay.WPF
 
                 service.Save(new Auction
                 {
+                    Id = 1,
                     Title = "My First Auction",
                     StartDateTimeUtc = DateTime.UtcNow.AddSeconds(10),
                     EndDateTimeUtc = DateTime.UtcNow.AddDays(14),
                     StartPrice = 72,
+                    Seller = me
+                });
+
+                service.Save(new Auction
+                {
+                    Id = 2,
+                    Title = "My Second Auction",
+                    StartDateTimeUtc = DateTime.UtcNow.AddSeconds(15),
+                    EndDateTimeUtc = DateTime.UtcNow.AddDays(10),
+                    StartPrice = 50,
                     Seller = me
                 });
             }
