@@ -42,5 +42,16 @@ namespace DotNetBay.WPF
             var sellView = new SellView();
             sellView.ShowDialog(); // Blocking
         }
+
+        private void Place_Button_Click(object sender, RoutedEventArgs e)
+        {
+            Auction testAuction = new Auction();
+            testAuction.Title = "Test";
+            testAuction.Description = "Huere geil";
+            testAuction.StartPrice = 400;
+            testAuction.CurrentPrice = 0;
+            var bidView = new BidView(testAuction);
+            bidView.ShowDialog();
+        }
     }
 }
