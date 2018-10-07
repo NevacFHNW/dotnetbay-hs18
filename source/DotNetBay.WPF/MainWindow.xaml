@@ -7,10 +7,9 @@
         d:DataContext="{d:DesignInstance Type=local:MainWindow}"
         mc:Ignorable="d"
         Title="MainWindow" Height="350" Width="725">
-
     <Window.Resources>
-        <local:IsClosedToStatusTextConverter x:Key="IsClosedToStatusTextConverter"></local:IsClosedToStatusTextConverter>
-        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"></BooleanToVisibilityConverter>
+        <local:BooleanToStatusTextConverter x:Key="BooleanToStatusTextConverter" />
+        <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter" />
     </Window.Resources>
 
     <Grid>
@@ -20,25 +19,24 @@
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
         <Label Content="WPF Auction Plattform" Grid.Row="0" FontFamily="Britannic Bold" Foreground="BlueViolet" FontSize="16" FontStyle="Italic" FontWeight="Bold"/>
-        <Button x:Name="NewAuctionBtn" Content="New Auction" HorizontalAlignment="Left" Margin="10,1.2,0,0" VerticalAlignment="Top" Width="75" Click="NewAuctionBtn_Click" Grid.Row="1"/>
+        <Button x:Name="NewAuctionBtn" Content="New Auction" HorizontalAlignment="Left" Margin="10,1.2,0,0" VerticalAlignment="Top" Width="75" Click="newAuctionBtn_Click" Grid.Row="1"/>
         <DataGrid Name="AuctionsDataGrid" Grid.Row="2" ItemsSource="{Binding Auctions}" AutoGenerateColumns="False" IsReadOnly="True">
             <DataGrid.Columns>
                 <DataGridTemplateColumn Header="Auction">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
                             <StackPanel>
-                                <TextBlock Text="{Binding Title}" FontWeight="Bold" ></TextBlock>
+                                <TextBlock Text="{Binding Title}" FontWeight="Bold"></TextBlock>
                                 <Image Source="{Binding Image}" MaxHeight="100" MaxWidth="120"></Image>
                             </StackPanel>
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
 
-                <DataGridTextColumn Binding="{Binding IsClosed, Converter={StaticResource IsClosedToStatusTextConverter}}" Header="Status"/>
-
+                <DataGridTextColumn Header="Status" Binding="{Binding Path= IsClosed, Converter={StaticResource BooleanToStatusTextConverter}}" />
                 <DataGridTextColumn Header="Start Price" Binding="{Binding StartPrice, StringFormat=\{0:C\}}" />
                 <DataGridTextColumn Header="Current Price" Binding="{Binding CurrentPrice, StringFormat=\{0:C\}}" />
-                <DataGridTextColumn Header="Bids" Binding="{Binding Path= Bids.Count}" />
+                <DataGridTextColumn Header="Bids" Binding="{Binding Path= Bids}" />
                 <DataGridTextColumn Header="Start Date" Binding="{Binding Path= StartDateTimeUtc}" />
                 <DataGridTextColumn Header="End Date" Binding="{Binding Path= EndDateTimeUtc}" />
                 <DataGridTextColumn Header="Seller" Binding="{Binding Path= Seller.DisplayName}" />
@@ -48,14 +46,12 @@
                 <DataGridTemplateColumn Header="Place Bid">
                     <DataGridTemplateColumn.CellTemplate>
                         <DataTemplate>
-                            <Button Background="Green" Click="PlaceBidButtonClick" Visibility="{Binding IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}">Place</Button>
+                            <Button Click="bidAuctionBtn_Click" Content="Place" Height="Auto" Width="Auto" Background="LimeGreen"
+                                    Visibility="{Binding IsRunning, Converter={StaticResource BooleanToVisibilityConverter}}" />
                         </DataTemplate>
                     </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-
             </DataGrid.Columns>
-
         </DataGrid>
-
     </Grid>
 </Window>
