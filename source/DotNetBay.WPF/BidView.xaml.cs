@@ -1,4 +1,4 @@
-﻿using DotNetBay.Core;
+using DotNetBay.Core;
 using DotNetBay.Data.Entity;
 using System;
 using System.Collections.Generic;
@@ -22,71 +22,51 @@ namespace DotNetBay.WPF
     /// <summary>
     /// Interaction logic for SellView.xaml
     /// </summary>
-    public partial class BidView : Window, INotifyPropertyChanged
+    public partial class BidView : Window
     {
-        public event PropertyChangedEventHandler PropertyChanged;
+        private readonly Auction selectedAuction;
 
-        private static readonly Regex Regex = new Regex("[^0-9.]+");
-        public Auction auction;
-        public string AuctionTitle { get; set; }
-        public string Description { get; set; }
-        public double StartPrice { get; set; }
-        public double CurrentPrice { get; set; }
-        public byte[] Image { get; set; }
-        private double _bid;
-        public double Bid
+        private readonly AuctionService auctionService;
+
+        public double YourBid { get; set; }
+
+        public Auction SelectedAuction
         {
-            get => _bid;
-            set
+            get
             {
-                if (IsTextAllowed(value.ToString()))
-                {
-                    _bid = value;
-                }
+                return this.selectedAuction;
             }
         }
 
-        private void NotifyPropertyChanged(string name)
+        public BidView(Auction selectedAuction)
         {
-            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
-        }
-        
+            this.selectedAuction = selectedAuction;
+            this.InitializeComponent();
 
-        public BidView(Auction auction)
-        {
-            InitializeComponent();
-            DataContext = this;
+            this.DataContext = this;
 
-            this.auction = auction;
-            AuctionTitle = auction.Title;
-            Description = auction.Description;
-            StartPrice = auction.StartPrice;
-            CurrentPrice = auction.CurrentPrice;
-            Image = auction.Image;
-        }
+            var app = Application.Current as App;
 
-        private void Place_Bid_Button_Click(object sender, RoutedEventArgs e)
-        {
+            if (app != null)
+            {
+                SimpleMemberService simpleMemberService  = new SimpleMemberService(app.MainRepository);
+                this.auctionService = new AuctionService(app.MainRepository, simpleMemberService);
+            }
 
+            this.YourBid = Math.Max(this.SelectedAuction.CurrentPrice, this.SelectedAuction.StartPrice);
         }
 
-        private byte[] getJPGFromImageControl(BitmapImage image)
+        private void PlaceBidAuction_Click(object sender, RoutedEventArgs e)
         {
-            MemoryStream memStream = new MemoryStream();
-            JpegBitmapEncoder encoder = new JpegBitmapEncoder();
-            encoder.Frames.Add(BitmapFrame.Create(image));
-            encoder.Save(memStream);
-            return memStream.ToArray();
+            // store new bid
+            this.auctionService.PlaceBid(this.SelectedAuction, this.YourBid);
+
+            this.Close();
         }
 
-        private void Cancel_Button_Click(object sender, RoutedEventArgs e)
+        private void CloseButton_Click(object sender, RoutedEventArgs e)
         {
-            Close();
-        }
-
-        private static bool IsTextAllowed(string text)
-        {
-            return !Regex.IsMatch(text);
+            this.Close();
         }
     }
 }

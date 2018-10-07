@@ -1,4 +1,4 @@
-﻿using DotNetBay.Core.Execution;
+using DotNetBay.Core.Execution;
 using DotNetBay.Data.Provider.FileStorage;
 using DotNetBay.Interfaces;
 using System;
@@ -21,24 +21,23 @@ namespace DotNetBay.WPF
     /// </summary>
     public partial class App : Application
     {
-        public readonly IMainRepository MainRepository;
-        public readonly AuctionRunner AuctionRunner;
+        public IMainRepository MainRepository { get; private set; }
+        public IAuctionRunner AuctionRunner { get; private set; }
 
         public App()
         {
-            MainRepository = new FileSystemMainRepository("repository/data/rep");
-            AuctionRunner = new AuctionRunner(MainRepository);
+            this.MainRepository = new FileSystemMainRepository("appdata.json");
+            this.MainRepository.SaveChanges();
+
+            this.FillSampleData();
+
+            this.AuctionRunner = new AuctionRunner(this.MainRepository);
+            this.AuctionRunner.Start();
+
+
         }
 
-        protected override void OnStartup(StartupEventArgs e)
-        {
-            base.OnStartup(e);
-            AuctionRunner.Start();
-            InitializeDemoRepository();
-
-        }
-
-        private void InitializeDemoRepository()
+        private void FillSampleData()
         {
             var memberService = new SimpleMemberService(this.MainRepository);
             var service = new AuctionService(this.MainRepository, memberService);
@@ -49,21 +48,10 @@ namespace DotNetBay.WPF
 
                 service.Save(new Auction
                 {
-                    Id = 1,
                     Title = "My First Auction",
                     StartDateTimeUtc = DateTime.UtcNow.AddSeconds(10),
                     EndDateTimeUtc = DateTime.UtcNow.AddDays(14),
                     StartPrice = 72,
-                    Seller = me
-                });
-
-                service.Save(new Auction
-                {
-                    Id = 2,
-                    Title = "My Second Auction",
-                    StartDateTimeUtc = DateTime.UtcNow.AddSeconds(15),
-                    EndDateTimeUtc = DateTime.UtcNow.AddDays(10),
-                    StartPrice = 50,
                     Seller = me
                 });
             }
