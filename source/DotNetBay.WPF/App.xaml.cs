@@ -1,18 +1,14 @@
-using DotNetBay.Core.Execution;
-using DotNetBay.Data.Provider.FileStorage;
-using DotNetBay.Interfaces;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Configuration;
-using System.Data;
+using System.Data.Entity;
+using System.Data.Entity.SqlServer;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
-using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Navigation;
 using DotNetBay.Core;
+using DotNetBay.Core.Execution;
+using DotNetBay.Data.EF;
+using DotNetBay.Data.EF.Migrations;
 using DotNetBay.Data.Entity;
+using DotNetBay.Interfaces;
 
 namespace DotNetBay.WPF
 {
@@ -26,7 +22,13 @@ namespace DotNetBay.WPF
 
         public App()
         {
-            this.MainRepository = new FileSystemMainRepository("appdata.json");
+            // ROLA - This is a hack to ensure that Entity Framework SQL Provider is copied across to the output folder.
+            // As it is installed in the GAC, Copy Local does not work. It is required for probing.
+            // Fixed "Provider not loaded" error
+            var ensureDLLIsCopied = SqlProviderServices.Instance;
+            Database.SetInitializer(new MigrateDatabaseToLatestVersion<MainDbContext, Configuration>());
+            //            this.MainRepository = new FileSystemMainRepository("appdata.json");
+            this.MainRepository = new EFMainRepository();
             this.MainRepository.SaveChanges();
 
             this.FillSampleData();
